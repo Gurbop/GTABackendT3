@@ -9,12 +9,17 @@ from sklearn.preprocessing import OneHotEncoder
 titanic_data = sns.load_dataset('titanic')
 
 # Preprocess the data
+# Drops columns named 'alive', 'who', 'adult_male', 'class', 'embark_town', and 'deck' from the dataset,
+# Drops any rows that contain missing values,
+# Converts the values in the 'sex' column to binary values (1 for 'male' and 0 for 'female'),
+# Converts the values in the 'alone' column to binary values (1 for True and 0 for False).
 titanic_data.drop(['alive', 'who', 'adult_male', 'class', 'embark_town', 'deck'], axis=1, inplace=True)
 titanic_data.dropna(inplace=True)
 titanic_data['sex'] = titanic_data['sex'].apply(lambda x: 1 if x == 'male' else 0)
 titanic_data['alone'] = titanic_data['alone'].apply(lambda x: 1 if x == True else 0)
 
 # Encode categorical variables
+# Changes data into numerical values which the marchine learning language model can recognize
 enc = OneHotEncoder(handle_unknown='ignore')
 enc.fit(titanic_data[['embarked']])
 onehot = enc.transform(titanic_data[['embarked']]).toarray()
