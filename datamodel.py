@@ -1,39 +1,50 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-import joblib
+import pickle  # Use pickle for serialization
+import numpy as np
 class datamodel:
-    def preprocessing(self):# this is loading in the file stuff into X and Y
-        self.X=self.data[['my_trophies','opponent_trophies','my_deck_elixir','op_deck_elixir']]
-        self.Y=self.data['my_result']
-    def train(self): 
-        #running the logisitcal regression function
-        self.model=LogisticRegression()
-        self.model.fit(self.X,self.Y)
-    def predict(self, my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir):
-        #predicting the result of victory or defeat based on your trophies and elixir and opponent elixir and trophies
-        return self.model.predict([[my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir]])[0]
-    def __init__(self):
-        #loading the model file in
-        #the pkl file needs to be loaded before we can do anything with it
-        self.model = joblib.load("clashroyale.pkl")
-    def readfile(self):
-        # makes the csv file into data
-        self.data=pd.read_csv("8V280L8VQ-clash-royale-da.csv")
+    def __init__(self, model_path="clashroyale.pkl", data_path="8V280L8VQ-clash-royale-da.csv"):
+        self.model_path = model_path
+        self.data_path = data_path
+        # Attempt to load the model; if not found, initialize a new LogisticRegression model
+        try:
+            with open(model_path, 'rb') as file:
+                self.model = pickle.load(file)
+                # Ensure the loaded object is an instance of a logistic regression model
+                if not isinstance(self.model, LogisticRegression):
+                    raise ValueError("Loaded model is not a LogisticRegression instance.")
+        except (FileNotFoundError, ValueError) as e:
+            print(f"Model load error: {e}. Initializing a new model.")
+            self.model = LogisticRegression()
+        self.data = pd.read_csv(data_path)  # Load data
+    def display_data_head(self):
         print(self.data.head())
-    def create(self, new_data):
-        # adding the new data to a list
+    def preprocess_data(self):
+        self.X = self.data[['my_trophies', 'opponent_trophies', 'my_deck_elixir', 'op_deck_elixir']]
+        self.Y = self.data['my_result']
+    def train_model(self):
+        self.preprocess_data()  # Ensure data is preprocessed
+        self.model.fit(self.X, self.Y)
+    def predict(self, my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir):
+        # Check if model has been trained or loaded correctly
+        if isinstance(self.model, LogisticRegression):
+            prediction = self.model.predict(np.array([[my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir]]))[0]
+            return prediction
+        else:
+            raise TypeError("The model instance is not correctly initialized.")
+    def add_data(self, new_data):
         self.data = self.data.append(new_data, ignore_index=True)
-    def exportmodel(self):
-        #exporting the file after the training is done
-        joblib.dump(self.model,"clashroyale.pkl")
-    def read(self):
-        # reading the data
+    def get_data(self):
         return self.data
-    def update(self, index, updated_data):
-        # updating data
+    def update_data(self, index, updated_data):
         self.data.loc[index] = updated_data
-    def delete(self, index):
-        # deleting data
+    def delete_data(self, index):
         self.data.drop(index, inplace=True)
-Model=datamodel()# setting Model to the python file
-print(Model.predict(1,1,3.6,2.5)) # sample run
+    def save_model(self):  # Explicitly save the model
+        with open(self.model_path, 'wb') as file:
+            pickle.dump(self.model, file)
+# Example usage
+model = datamodel()  # Initialize the model and load data
+model.train_model()  # Train the model before prediction
+print(model.predict(111, 1, 5, 2))  # Example prediction
+model.save_model()  # Save the model after training
