@@ -16,3 +16,11 @@ class datamodel:
     def preprocess_data(self):
         self.X = self.data[['my_trophies', 'opponent_trophies', 'my_deck_elixir', 'op_deck_elixir']]
         self.Y = self.data['my_result']
+    def train_model(self):
+        self.preprocess_data()  # Ensure data is preprocessed
+        self.model = LogisticRegression()
+        self.model.fit(self.X, self.Y)
+        
+    def predict(self, my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir):
+        prediction = self.model.predict([[my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir]])[0]
+        return prediction
