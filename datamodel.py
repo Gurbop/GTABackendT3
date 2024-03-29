@@ -35,4 +35,5 @@ class datamodel:
     def delete(self, index):
         # deleting data
         self.data.drop(index, inplace=True)
-Model=datamodel() # setting Model to the python file
+Model=datamodel()# setting Model to the python file
+print(Model.predict(1,1,3.6,2.5)) # sample run
