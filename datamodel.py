@@ -8,16 +8,19 @@ class datamodel:
     def readfile(self):
         self.data=pd.read_csv("8V280L8VQ-clash-royale-da.csv")
         print(self.data.head())
-    def preprocessing(self):# this is loading in the file stuff into X and Y
+        # loads the stuff in the file into X and Y
+    def preprocessing(self):
         self.X=self.data[['my_trophies','opponent_trophies','my_deck_elixir','op_deck_elixir']]
         self.Y=self.data['my_result']
-    def train(self): # this is actually trianing the model
+        # trains the model
+    def train(self):
         self.model=LogisticRegression()
         self.model.fit(self.X,self.Y)
     def predict(self, my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir): # this is prediciton function
         return self.model.predict([[my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir]])[0]
     
-    def exportmodel(self): #after trianing we have to export the file again
+    def exportmodel(self): 
+        #after trianing we have to export the file again
         joblib.dump(self.model,"clashroyale.pkl")
     
     def create(self, new_data):
@@ -34,5 +37,3 @@ class datamodel:
     
     
 Model=datamodel()# sample class thing
-
-print(Model.predict(1,1,3.6,2.5))# sample Prediction
