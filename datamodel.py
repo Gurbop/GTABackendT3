@@ -40,5 +40,5 @@ class datamodel:
         self.data.drop(index, inplace=True)
 
 # Usage
-model = DataModel()  # Initialize the model and load data
+model = datamodel()  # Initialize the model and load data
 print(model.predict(111, 1, 5, 2))  # Example prediction
