@@ -5,19 +5,15 @@ from datetime import datetime
 from auth_middleware import token_required
 from datamodel import datamodel
 from model.users import User
-
 user_api = Blueprint('user_api', __name__,
                    url_prefix='/api/users')
-
 # API docs https://flask-restful.readthedocs.io/en/latest/api.html
 api = Api(user_api)
-
-class UserAPI:        
+class UserAPI:
     class _CRUD(Resource):  # User API operation for Create, Read.  THe Update, Delete methods need to be implemeented
         def post(self): # Create method
             ''' Read data for json body '''
             body = request.get_json()
-            
             ''' Avoid garbage in, error checking '''
             # validate name
             name = body.get('name')
@@ -30,11 +26,9 @@ class UserAPI:
             # look for password and dob
             password = body.get('password')
             dob = body.get('dob')
-
             ''' #1: Key code block, setup USER OBJECT '''
-            uo = User(name=name, 
+            uo = User(name=name,
                       uid=uid)
-            
             ''' Additional garbage error checking '''
             # set password if provided
             if password is not None:
@@ -45,7 +39,6 @@ class UserAPI:
                     uo.dob = datetime.strptime(dob, '%Y-%m-%d').date()
                 except:
                     return {'message': f'Date of birth format error {dob}, must be mm-dd-yyyy'}, 400
-            
             ''' #2: Key Code block to add user to database '''
             # create user in database
             user = uo.create()
@@ -54,13 +47,11 @@ class UserAPI:
                 return jsonify(user.read())
             # failure returns error
             return {'message': f'Processed {name}, either a format error or User ID {uid} is duplicate'}, 400
-
         @token_required()
         def get(self, _): # Read Method, the _ indicates current_user is not used
             users = User.query.all()    # read/extract all users from database
             json_ready = [user.read() for user in users]  # prepare output in json
             return jsonify(json_ready)  # jsonify creates Flask response object, more specific to APIs than json.dumps
-   
         @token_required("Admin")
         def delete(self, _): # Delete Method
             body = request.get_json()
@@ -69,10 +60,10 @@ class UserAPI:
             if user is None:
                 return {'message': f'User {uid} not found'}, 404
             json = user.read()
-            user.delete() 
+            user.delete()
             # 204 is the status code for delete with no json response
             return f"Deleted user: {json}", 204 # use 200 to test with Postman
-    class ML:
+    class ML(Resource):
         def post(self):
             try:
                 body = request.get_json()
@@ -107,7 +98,6 @@ class UserAPI:
                 if uid is None:
                     return {'message': f'User ID is missing'}, 401
                 password = body.get('password')
-                
                 ''' Find user '''
                 user = User.query.filter_by(_uid=uid).first()
                 if user is None or not user.is_password(password):
@@ -126,7 +116,6 @@ class UserAPI:
                                 httponly=True,
                                 path='/',
                                 samesite='None'  # This is the key part for cross-site requests
-
                                 # domain="frontend.com"
                                 )
                         return resp
@@ -146,10 +135,9 @@ class UserAPI:
                         "error": str(e),
                         "data": None
                 }, 500
-
             
     # building RESTapi endpoint
     api.add_resource(_CRUD, '/')
     api.add_resource(_Security, '/authenticate')
-    api.add_resource(ML,'/ML')
+    api.add_resource(_ML,'/ML')
     
