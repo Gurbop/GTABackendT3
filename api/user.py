@@ -77,7 +77,8 @@ class UserAPI:
                 prediction_result = Model.predict(mt, ot, me,oe)
                 return jsonify(prediction_result)
             except Exception as e:
-                print("Prediction error:", str(e))  # Log the error
+                # Logging the error
+                print("Prediction error:", str(e))
                 return {
                     "message": "Something went wrong during prediction!",
                     "error": str(e),
