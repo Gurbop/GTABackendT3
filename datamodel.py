@@ -24,3 +24,21 @@ class datamodel:
     def predict(self, my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir):
         prediction = self.model.predict([[my_trophies, opponent_trophies, my_deck_elixir, op_deck_elixir]])[0]
         return prediction
+    def save_model(self):
+        joblib.dump(self.model, self.model_path)
+        
+    def add_data(self, new_data):
+        self.data = self.data.append(new_data, ignore_index=True)
+        
+    def get_data(self):
+        return self.data
+    
+    def update_data(self, index, updated_data):
+        self.data.loc[index] = updated_data
+        
+    def delete_data(self, index):
+        self.data.drop(index, inplace=True)
+
+# Usage
+model = DataModel()  # Initialize the model and load data
+print(model.predict(111, 1, 5, 2))  # Example prediction
