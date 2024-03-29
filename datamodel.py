@@ -12,3 +12,11 @@ class datamodel:
     def predict(self, my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir):
         #predicting the result of victory or defeat based on your trophies and elixir and opponent elixir and trophies
         return self.model.predict([[my_trophies, opponent_trophies, my_deck_elixir,op_deck_elixir]])[0]
+    def __init__(self):
+        #loading the model file in
+        #the pkl file needs to be loaded before we can do anything with it
+        self.model = joblib.load("clashroyale.pkl")
+    def readfile(self):
+        # makes the csv file into data
+        self.data=pd.read_csv("8V280L8VQ-clash-royale-da.csv")
+        print(self.data.head())
